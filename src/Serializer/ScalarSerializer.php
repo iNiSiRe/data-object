@@ -5,6 +5,7 @@ namespace inisire\DataObject\Serializer;
 
 
 use inisire\DataObject\Definition\Definition;
+use inisire\DataObject\Definition\TEnum;
 use inisire\DataObject\Definition\TInteger;
 use inisire\DataObject\Definition\TMixed;
 use inisire\DataObject\Definition\TNumber;
@@ -43,12 +44,38 @@ class ScalarSerializer implements DataSerializerInterface
 
     public function serialize(Definition $type, mixed $data)
     {
-        return $data;
+        if ($type instanceof TEnum) {
+            return $type->isKeyAsLabel() ? array_flip($type->getOptions())[$data] : $data;
+        } else {
+            return $data;
+        }
     }
 
     public function deserialize(Definition $type, mixed $data, array &$errors = [])
     {
-        return $this->filter($type, $data, $errors);
+        if ($type instanceof TEnum) {
+            $filteredData = $this->filter($type->getType(), $data, $errors);
+
+            if ($type->isKeyAsLabel()) {
+                $map = $type->getOptions();
+                if (!in_array($filteredData, array_keys($map))) {
+                    $errors[] = new Error('The value should be in enum');
+                    $filteredData = null;
+                } else {
+                    $filteredData = $map[$filteredData];
+                }
+            } else {
+                $enum = $type->getOptions();
+                if (!in_array($filteredData, $enum)) {
+                    $errors[] = new Error('The value should be in enum');
+                    $filteredData = null;
+                }
+            }
+        } else {
+            $filteredData = $this->filter($type, $data, $errors);
+        }
+
+        return $filteredData;
     }
 
     public function isSupports(Definition $definition): bool
@@ -56,6 +83,7 @@ class ScalarSerializer implements DataSerializerInterface
         return $definition instanceof TString
             || $definition instanceof TNumber
             || $definition instanceof TInteger
-            || $definition instanceof TMixed;
+            || $definition instanceof TMixed
+            || $definition instanceof TEnum;
     }
 }

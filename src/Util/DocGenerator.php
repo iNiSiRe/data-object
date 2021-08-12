@@ -8,6 +8,7 @@ use inisire\DataObject\Definition\Definition;
 use inisire\DataObject\Definition\TCollection;
 use inisire\DataObject\Definition\TDateTime;
 use inisire\DataObject\Definition\TDictionary;
+use inisire\DataObject\Definition\TEnum;
 use inisire\DataObject\Definition\TMixed;
 use inisire\DataObject\Definition\TObjectReference;
 use inisire\DataObject\Definition\TPartialObject;
@@ -128,6 +129,11 @@ class DocGenerator
                 return [
                     'oneOf' => $schemas
                 ];
+            },
+            TEnum::class => function (TEnum $type) {
+                $schema = $this->createSchema($type->getType());
+                $schema['enum'] = $type->isKeyAsLabel() ? array_keys($type->getOptions()) : $type->getOptions();
+                return $schema;
             }
         ];
     }
