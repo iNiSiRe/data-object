@@ -9,4 +9,6 @@ use inisire\DataObject\Definition\TObjectReference;
 interface ObjectLoaderInterface
 {
     public function load(TObjectReference $definition, mixed $id): ?object;
+
+    public function getAlias(): string;
 }

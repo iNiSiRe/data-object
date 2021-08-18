@@ -10,12 +10,14 @@ use inisire\DataObject\Error\Error;
 use inisire\DataObject\Util\MongoDocumentLoader;
 use inisire\DataObject\Util\ObjectLoaderInterface;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 class ObjectReferenceSerializer implements DataSerializerInterface, ServiceSubscriberInterface
 {
-    private ContainerInterface $container;
+    private ServiceLocator|ContainerInterface $container;
+
     private PropertyAccessor $accessor;
 
     public function __construct(ContainerInterface $container)
@@ -39,22 +41,26 @@ class ObjectReferenceSerializer implements DataSerializerInterface, ServiceSubsc
             return null;
         }
 
-        if ($this->container->has($type->loader)) {
+        foreach ($this->container->getProvidedServices() as $class) {
             /**
              * @var ObjectLoaderInterface $loader
              */
-            $loader = $this->container->get($type->loader);
-        } else {
-            throw new \RuntimeException(sprintf('The loader "%s" not exists', $type->loader));
+            $loader = $this->container->get($class);
+
+            if ($loader->getAlias() !== $type->loader) {
+                continue;
+            }
+
+            $result = $loader->load($type, $data);
+
+            if ($result === null) {
+                $errors[] = new Error('The value should be an existing reference');
+            }
+
+            return $result;
         }
 
-        $result = $loader->load($type, $data);
-
-        if ($result === null) {
-            $errors[] = new Error('The value should be an existing reference');
-        }
-
-        return $result;
+        throw new \RuntimeException(sprintf('The loader "%s" not exists', $type->loader));
     }
 
     public function isSupports(Definition $definition): bool

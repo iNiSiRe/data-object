@@ -20,4 +20,9 @@ class MongoDocumentLoader implements ObjectLoaderInterface
     {
         return $this->manager->getRepository($definition->object->getClass())->find($id);
     }
+
+    public function getAlias(): string
+    {
+        return 'odm';
+    }
 }

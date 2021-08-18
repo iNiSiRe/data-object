@@ -12,6 +12,7 @@ use inisire\DataObject\Error\Error;
 use inisire\DataObject\Serializer\DataSerializerInterface;
 use inisire\DataObject\Serializer\DateTimeSerializer;
 use inisire\DataObject\Serializer\DictionarySerializer;
+use inisire\DataObject\Serializer\FileSerializer;
 use inisire\DataObject\Serializer\ScalarSerializer;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use inisire\DataObject\Definition\IObject;
@@ -33,12 +34,13 @@ class DataMapper
 
     public function __construct()
     {
-        $this->accessor = new PropertyAccessor(throwExceptionOnInvalidPropertyPath: false);
+        $this->accessor = new PropertyAccessor(throw: PropertyAccessor::DO_NOT_THROW);
         $this->metadataReader = new ObjectMetadataReader();
         $this->serializers = [
             new ScalarSerializer(),
             new DictionarySerializer(),
             new DateTimeSerializer(),
+            new FileSerializer()
         ];
     }
 
@@ -68,13 +70,22 @@ class DataMapper
             return null;
         }
 
+        if (is_string($definition) && class_exists($definition)) {
+            $definition = new TObject($definition);
+        }
+
+        if (is_object($data)) {
+            if (is_a($data, $definition->getClass(), true)) {
+                return $data;
+            } else {
+                $errors[] = new Error(sprintf('The value should be an object of class "%s"', $definition->getClass()));
+                return null;
+            }
+        }
+
         if (!is_array($data)) {
             $errors[] = new Error('The value should be an array');
             return null;
-        }
-
-        if (is_string($definition) && class_exists($definition)) {
-            $definition = new TObject($definition);
         }
 
         if ($definition instanceof TObject) {

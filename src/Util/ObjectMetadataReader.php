@@ -15,6 +15,7 @@ use inisire\DataObject\Definition\TObject;
 use inisire\DataObject\Definition\TPartialObject;
 use inisire\DataObject\Definition\TString;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 
 class ObjectMetadataReader
 {
@@ -25,11 +26,12 @@ class ObjectMetadataReader
     {
         $this->annotationReader = new AnnotationReader();
         $this->propertyAccessor = new PropertyAccessor();
+        $this->reflectionExtractor = new ReflectionExtractor();
     }
 
     protected function guessPropertyDefinition(\ReflectionProperty $property): ?Definition
     {
-        $type = $property->getType()->getName();
+        $type = $property->getType()?->getName();
 
         $definition = match ($type) {
             'string' => new TString(),
@@ -46,8 +48,18 @@ class ObjectMetadataReader
         return $definition;
     }
 
+    private function isReadable(string $class, string $property): bool
+    {
+        return $this->reflectionExtractor->isReadable($class, $property);
+    }
+
+    private function isWritable(string $class, string $property): bool
+    {
+        return $this->reflectionExtractor->isWritable($class, $property);
+    }
+
     /**
-     * @param object $object
+     * @param TObject|TPartialObject|object $object
      *
      * @return array<\inisire\DataObject\Definition\Property>
      */
@@ -89,13 +101,14 @@ class ObjectMetadataReader
             }
 
             if ($object instanceof TObject) {
-                $instance = $object->createInstance();
+                $reflection = new \ReflectionClass($object->getClass());
+                $instance = $reflection->newInstanceWithoutConstructor();
             } else {
                 $instance = $object;
             }
 
-            $readable = $this->propertyAccessor->isReadable($instance, $property->getName());
-            $writable = $this->propertyAccessor->isWritable($instance, $property->getName());
+            $readable = $this->isReadable($instance::class, $property->getName());
+            $writable = $this->isWritable($instance::class, $property->getName());
 
             if ($readable === false && $writable === false) {
                 continue;

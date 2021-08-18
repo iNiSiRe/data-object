@@ -33,7 +33,7 @@ class DataTransformer
 
     public function __construct()
     {
-        $this->accessor = new PropertyAccessor(throwExceptionOnInvalidPropertyPath: false);
+        $this->accessor = new PropertyAccessor(throw: PropertyAccessor::DO_NOT_THROW);
         $this->metadataReader = new ObjectMetadataReader();
         $this->serializers = [
             new ScalarSerializer(),
