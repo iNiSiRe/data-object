@@ -4,6 +4,7 @@ namespace inisire\DataObject\Serializer;
 
 use inisire\DataObject\Definition\Definition;
 use inisire\DataObject\Definition\TFile;
+use inisire\DataObject\Errors;
 use Symfony\Component\HttpFoundation\File\File;
 
 class FileSerializer implements DataSerializerInterface
@@ -22,7 +23,7 @@ class FileSerializer implements DataSerializerInterface
         if ($data instanceof File) {
             return $data;
         } else {
-            $errors[] = sprintf('File should be instance of "%s"', File::class);
+            $errors[] = Errors::create(Errors::INVALID_FILE);
             return null;
         }
     }

@@ -7,6 +7,7 @@ namespace inisire\DataObject\Serializer;
 use inisire\DataObject\Definition\Definition;
 use inisire\DataObject\Definition\TObjectReference;
 use inisire\DataObject\Error\Error;
+use inisire\DataObject\Errors;
 use inisire\DataObject\Util\MongoDocumentLoader;
 use inisire\DataObject\Util\ObjectLoaderInterface;
 use Psr\Container\ContainerInterface;
@@ -54,7 +55,7 @@ class ObjectReferenceSerializer implements DataSerializerInterface, ServiceSubsc
             $result = $loader->load($type, $data);
 
             if ($result === null) {
-                $errors[] = new Error('The value should be an existing reference');
+                $errors[] = Errors::create(Errors::INVALID_OBJECT_REFERENCE);
             }
 
             return $result;

@@ -6,6 +6,7 @@ namespace inisire\DataObject\Util;
 
 use inisire\DataObject\Definition\Definition;
 use inisire\DataObject\Definition\IObject;
+use inisire\DataObject\Definition\TBoolean;
 use inisire\DataObject\Definition\TCollection;
 use inisire\DataObject\Definition\TInteger;
 use inisire\DataObject\Definition\TNumber;
@@ -88,6 +89,7 @@ class DataTransformer
             is_string($data) => new TString(),
             is_int($data) => new TInteger(),
             is_float($data) => new TNumber(),
+            is_bool($data) => new TBoolean(),
             default => null
         };
     }

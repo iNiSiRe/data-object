@@ -4,22 +4,38 @@
 namespace inisire\DataObject\Error;
 
 
-class PropertyError implements ErrorInterface
+class PropertyError
 {
     private string $property;
-    private ErrorInterface $error;
 
-    public function __construct(string $property, ErrorInterface $error)
+    /**
+     * @var array<ErrorInterface>
+     */
+    private array $errors;
+
+    /**
+     * @param string                $property
+     * @param array<ErrorInterface> $errors
+     */
+    public function __construct(string $property, array $errors)
     {
         $this->property = $property;
-        $this->error = $error;
+        $this->errors = $errors;
     }
 
-    public function toArray(): array
+    /**
+     * @return string
+     */
+    public function getProperty(): string
     {
-        return [
-            'property' => $this->property,
-            'error' => $this->error->toArray()
-        ];
+        return $this->property;
+    }
+
+    /**
+     * @return ErrorInterface[]
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
     }
 }

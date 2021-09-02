@@ -6,20 +6,28 @@ namespace inisire\DataObject\Error;
 
 class Error implements ErrorInterface
 {
-    private string $message;
-    private string $description;
+    private string $code;
+    private ErrorMessage $message;
 
-    public function __construct(string $message, string $description = '')
+    public function __construct(ErrorMessage $message, string $code)
     {
         $this->message = $message;
-        $this->description = $description;
+        $this->code = $code;
     }
 
-    public function toArray(): array
+    /**
+     * @return string
+     */
+    public function getCode(): string
     {
-        return [
-            'message' => $this->message,
-            'description' => $this->description
-        ];
+        return $this->code;
+    }
+
+    /**
+     * @return ErrorMessage
+     */
+    public function getMessage(): ErrorMessage
+    {
+        return $this->message;
     }
 }

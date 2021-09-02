@@ -7,6 +7,7 @@ namespace inisire\DataObject\Serializer;
 use inisire\DataObject\Definition\Definition;
 use inisire\DataObject\Definition\TDictionary;
 use inisire\DataObject\Error\Error;
+use inisire\DataObject\Errors;
 
 class DictionarySerializer implements DataSerializerInterface
 {
@@ -32,7 +33,7 @@ class DictionarySerializer implements DataSerializerInterface
         if (is_array($data)) {
             return $data;
         } else {
-            $errors[] = new Error('The value should be an array');
+            $errors[] = Errors::create(Errors::INVALID_DICTIONARY);
             return null;
         }
     }

@@ -6,5 +6,6 @@ namespace inisire\DataObject\Error;
 
 interface ErrorInterface
 {
-    public function toArray(): array;
+    public function getCode(): string;
+    public function getMessage(): ErrorMessage;
 }

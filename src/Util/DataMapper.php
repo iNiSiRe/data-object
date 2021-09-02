@@ -9,6 +9,7 @@ use inisire\DataObject\Definition\TCollection;
 use inisire\DataObject\Definition\TPartialObject;
 use inisire\DataObject\Definition\TPolymorphObject;
 use inisire\DataObject\Error\Error;
+use inisire\DataObject\Errors;
 use inisire\DataObject\Serializer\DataSerializerInterface;
 use inisire\DataObject\Serializer\DateTimeSerializer;
 use inisire\DataObject\Serializer\DictionarySerializer;
@@ -74,17 +75,12 @@ class DataMapper
             $definition = new TObject($definition);
         }
 
-        if (is_object($data)) {
-            if (is_a($data, $definition->getClass(), true)) {
-                return $data;
-            } else {
-                $errors[] = new Error(sprintf('The value should be an object of class "%s"', $definition->getClass()));
-                return null;
-            }
+        if (is_object($data) && is_a($data, $definition->getClass(), true)) {
+            return $data;
         }
 
         if (!is_array($data)) {
-            $errors[] = new Error('The value should be an array');
+            $errors[] = Errors::create(Errors::IS_NOT_ARRAY);
             return null;
         }
 
@@ -98,18 +94,18 @@ class DataMapper
             $key = $data[$discriminator->getProperty()] ?? null;
 
             if ($key === null) {
-                $errors[] = new PropertyError(
-                    $discriminator->getProperty(),
-                    new Error('The value should not be blank')
-                );
+                $errors[] = new PropertyError($discriminator->getProperty(), [Errors::create(Errors::IS_BLANK)]);
+                return null;
             }
 
             $instance = $definition->createInstance($key);
 
             if ($instance === null) {
-                $errors[] = new Error(
-                    'The value should be a valid discriminator',
-                    'Available values: ' . implode(', ', array_keys($discriminator->getMap()))
+                $errors[] = new PropertyError(
+                    $discriminator->getProperty(),
+                    Errors::create(Errors::INVALID_DISCRIMINATOR, [
+                        '{{values}}', implode(', ', array_keys($discriminator->getMap()))
+                    ])
                 );
                 return null;
             }
@@ -127,7 +123,7 @@ class DataMapper
             }
 
             if ($property->isReadOnly()) {
-                $errors[] = new PropertyError($property->getName(), new Error('Read only'));
+                $errors[] = new PropertyError($property->getName(), [Errors::create(Errors::IS_NOT_WRITABLE)]);
                 continue;
             }
 
@@ -135,7 +131,7 @@ class DataMapper
             $transformedData = $this->any($property->getType(), $data[$propertyName], $transformErrors);
 
             if (count($transformErrors) > 0) {
-                $errors[] = new PropertyError($property->getName(), new BulkError($transformErrors));
+                $errors[] = new PropertyError($property->getName(), $transformErrors);
             }
 
             if ($transformedData === null && $property->isAllowNull() === false) {
@@ -159,7 +155,7 @@ class DataMapper
         }
 
         if (!is_array($data)) {
-            $errors[] = new Error('The value should be an array');
+            $errors[] = Errors::create(Errors::INVALID_COLLECTION);
             return null;
         }
 

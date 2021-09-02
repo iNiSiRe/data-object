@@ -12,6 +12,6 @@ class TPartialObject extends \inisire\DataObject\Definition\TPartialObject
 
     public function __construct(array $options)
     {
-        parent::__construct($options['class'] ?? null);
+        parent::__construct($options['class'] ?? $options['value'] ?? null);
     }
 }

@@ -5,9 +5,11 @@ namespace inisire\DataObject\Util;
 
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use inisire\DataObject\Definition\Annotation\Ignore;
 use inisire\DataObject\Definition\Annotation\Property;
 use inisire\DataObject\Definition\Definition;
 use inisire\DataObject\Definition\IObject;
+use inisire\DataObject\Definition\TBoolean;
 use inisire\DataObject\Definition\TDateTime;
 use inisire\DataObject\Definition\TInteger;
 use inisire\DataObject\Definition\TNumber;
@@ -20,12 +22,11 @@ use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 class ObjectMetadataReader
 {
     private AnnotationReader $annotationReader;
-    private PropertyAccessor $propertyAccessor;
+    private ReflectionExtractor $reflectionExtractor;
 
     public function __construct()
     {
         $this->annotationReader = new AnnotationReader();
-        $this->propertyAccessor = new PropertyAccessor();
         $this->reflectionExtractor = new ReflectionExtractor();
     }
 
@@ -37,6 +38,7 @@ class ObjectMetadataReader
             'string' => new TString(),
             'int' => new TInteger(),
             'float' => new TNumber(),
+            'bool' => new TBoolean(),
             \DateTime::class => new TDateTime(),
             default => null
         };
@@ -85,6 +87,12 @@ class ObjectMetadataReader
 
         $properties = [];
         foreach ($class->getProperties() as $property) {
+            $ignore = $this->annotationReader->getPropertyAnnotation($property, Ignore::class);
+
+            if ($ignore) {
+                continue;
+            }
+
             /**
              * @var Property $annotation
              */
@@ -101,14 +109,13 @@ class ObjectMetadataReader
             }
 
             if ($object instanceof TObject) {
-                $reflection = new \ReflectionClass($object->getClass());
-                $instance = $reflection->newInstanceWithoutConstructor();
+                $class = $object->getClass();
             } else {
-                $instance = $object;
+                $class = $object::class;
             }
 
-            $readable = $this->isReadable($instance::class, $property->getName());
-            $writable = $this->isWritable($instance::class, $property->getName());
+            $readable = $this->isReadable($class, $property->getName());
+            $writable = $this->isWritable($class, $property->getName());
 
             if ($readable === false && $writable === false) {
                 continue;

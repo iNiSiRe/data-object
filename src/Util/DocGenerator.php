@@ -9,6 +9,7 @@ use inisire\CQRS\Schema\FormData;
 use inisire\CQRS\Schema\Schema;
 use inisire\CQRS\Schema\Stream;
 use inisire\DataObject\Definition\Definition;
+use inisire\DataObject\Definition\TBoolean;
 use inisire\DataObject\Definition\TCollection;
 use inisire\DataObject\Definition\TDateTime;
 use inisire\DataObject\Definition\TDictionary;
@@ -146,7 +147,10 @@ class DocGenerator
                     'type'   => 'string',
                     'format' => 'binary'
                 ];
-            }
+            },
+            TBoolean::class         => fn(TBoolean $type) => [
+                'type' => 'boolean'
+            ]
         ];
     }
 
@@ -174,12 +178,15 @@ class DocGenerator
 
     public function getObjectSchemaReference(TObject $type)
     {
-        if (!isset($this->schemas[$type->getClass()])) {
-            $this->schemas[$type->getClass()] = $this->createSchema($type);
+        $parts = explode('\\', $type->getClass());
+        $name = end($parts);
+
+        if (!isset($this->schemas[$name])) {
+            $this->schemas[$name] = $this->createSchema($type);
         }
 
         return [
-            '$ref' => sprintf('#/components/schemas/%s', $type->getClass())
+            '$ref' => sprintf('#/components/schemas/%s', $name)
         ];
     }
 
@@ -195,10 +202,10 @@ class DocGenerator
 
             if ($method === 'GET') {
                 $parametersSchema = [[
-                    'in'     => 'query',
-                    'name'   => 'query',
-                    'schema' => $schema
-                ]];
+                                         'in'     => 'query',
+                                         'name'   => 'query',
+                                         'schema' => $schema
+                                     ]];
             } else {
                 $requestBodySchema = [
                     'content' => [
@@ -231,17 +238,29 @@ class DocGenerator
             throw new \InvalidArgumentException(sprintf('Unsupported output "%s"', $response::class));
         }
 
-        $this->paths[$path][strtolower($method)] = [
-            'tags'        => $tags,
-            'summary'     => $description,
-            'parameters'  => $parametersSchema,
-            'requestBody' => $requestBodySchema,
-            'responses'   => [
+        $schema = [
+            'tags'    => $tags,
+            'summary' => $description
+        ];
+
+        if ($parametersSchema) {
+            $schema['parameters'] = $parametersSchema;
+        }
+
+        if ($requestBodySchema) {
+            $schema['requestBody'] = $requestBodySchema;
+        }
+
+        if ($content) {
+            $schema['responses'] = [
                 '200' => [
+                    'description' => '',
                     'content' => $content
                 ]
-            ]
-        ];
+            ];
+        }
+
+        $this->paths[$path][strtolower($method)] = $schema;
     }
 
     /**

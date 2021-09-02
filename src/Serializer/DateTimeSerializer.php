@@ -7,6 +7,7 @@ namespace inisire\DataObject\Serializer;
 use inisire\DataObject\Definition\Definition;
 use inisire\DataObject\Definition\TDateTime;
 use inisire\DataObject\Error\Error;
+use inisire\DataObject\Errors;
 
 class DateTimeSerializer implements DataSerializerInterface
 {
@@ -30,14 +31,14 @@ class DateTimeSerializer implements DataSerializerInterface
         }
 
         if (is_string($data) === false) {
-            $errors[] = new Error('The value should be a string');
+            $errors[] = Errors::create(Errors::IS_NOT_STRING);
             return null;
         }
 
         $result = \DateTime::createFromFormat($type->getFormat(), $data);
 
         if ($result === false) {
-            $errors[] = new Error(sprintf('The value should be valid date-time string formatted "%s"', $type->getFormat()));
+            $errors[] = Errors::create(Errors::INVALID_DATETIME, ['{{format}}' => $type->getFormat()]);
             return null;
         }
 
