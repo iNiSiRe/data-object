@@ -36,13 +36,13 @@ class ScalarSerializer implements DataSerializerInterface
             ?? self::OPTIONS_BY_TYPENAME[gettype($data)]
             ?? [FILTER_UNSAFE_RAW];
 
-        $data = filter_var($data, $options[0], $options[1] ?? null);
+        $filtered = filter_var($data, $options[0], ($options[1] ?? null) | FILTER_NULL_ON_FAILURE);
 
-        if ($data === false) {
+        if ($data !== null && $filtered === null) {
             $errors[] = Errors::create(Errors::INVALID_SCALAR);
             return null;
         } else {
-            return $data;
+            return $filtered;
         }
     }
 
