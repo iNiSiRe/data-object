@@ -16,10 +16,10 @@ class Errors
     public const INVALID_SCALAR = '1ec040c8-9743-6d12-882e-89234ca322a1';
     public const INVALID_ENUM = '1ec040c8-d1c3-6dde-b70a-d9b7bea2f197';
     public const INVALID_COLLECTION = '1ec04161-d86f-6180-91a5-af4fa04bbd33';
-    public const IS_NOT_WRITABLE = '';
-    public const INVALID_DISCRIMINATOR = '';
-    public const IS_BLANK = '';
-    public const IS_NOT_ARRAY = '';
+    public const IS_NOT_WRITABLE = 'c5062e95-be2d-4450-b883-9a5d402f61ba';
+    public const INVALID_DISCRIMINATOR = 'e4a885b7-3f07-4552-b6e8-87fa0a27e8c9';
+    public const IS_BLANK = '373321c4-0174-4090-9310-30c32e20bf9b';
+    public const IS_NOT_ARRAY = '283bf59b-3399-4fd9-b3b3-cd4378018440';
 
     protected const MESSAGES = [
         self::IS_NOT_STRING            => 'This value should be a string',

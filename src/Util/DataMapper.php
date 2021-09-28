@@ -103,9 +103,11 @@ class DataMapper
             if ($instance === null) {
                 $errors[] = new PropertyError(
                     $discriminator->getProperty(),
-                    Errors::create(Errors::INVALID_DISCRIMINATOR, [
-                        '{{values}}', implode(', ', array_keys($discriminator->getMap()))
-                    ])
+                    [
+                        Errors::create(Errors::INVALID_DISCRIMINATOR, [
+                            '{{values}}', implode(', ', array_keys($discriminator->getMap()))
+                        ])
+                    ]
                 );
                 return null;
             }

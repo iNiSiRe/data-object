@@ -19,7 +19,7 @@ class ScalarSerializer implements DataSerializerInterface
     private const OPTIONS_BY_DEFINITION = [
         TNumber::class => [FILTER_VALIDATE_FLOAT],
         TInteger::class => [FILTER_VALIDATE_INT],
-        TString::class => [FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH],
+        TString::class => [FILTER_UNSAFE_RAW],
         TBoolean::class => [FILTER_VALIDATE_BOOL]
     ];
 
