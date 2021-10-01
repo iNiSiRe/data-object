@@ -61,7 +61,7 @@ class DataTransformer
         throw new \RuntimeException(sprintf('Serializer for the type "%s" not exists', $type::class));
     }
 
-    public function object(object $object, TObject|TPolymorphObject|null $type = null): ?array
+    public function object(?object $object, TObject|TPolymorphObject|null $type = null): ?array
     {
         if ($object === null) {
             return null;
@@ -121,8 +121,10 @@ class DataTransformer
             return $this->object($data, $type);
         } elseif ($type instanceof TPolymorphObject) {
             $serialized = $this->object($data, $type);
-            $discriminator = $type->getDiscriminator();
-            $serialized[$discriminator->getProperty()] = array_flip($discriminator->getMap())[$data::class] ?? null;
+            if ($serialized !== null) {
+                $discriminator = $type->getDiscriminator();
+                $serialized[$discriminator->getProperty()] = array_flip($discriminator->getMap())[$data::class] ?? null;
+            }
             return $serialized;
         } elseif ($type instanceof TCollection) {
             return $this->collection($data, $type);
