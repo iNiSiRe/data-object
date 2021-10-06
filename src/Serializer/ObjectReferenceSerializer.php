@@ -8,6 +8,7 @@ use inisire\DataObject\Definition\Definition;
 use inisire\DataObject\Definition\TObjectReference;
 use inisire\DataObject\Error\Error;
 use inisire\DataObject\Errors;
+use inisire\DataObject\Util\EntityManagerObjectLoader;
 use inisire\DataObject\Util\MongoDocumentLoader;
 use inisire\DataObject\Util\ObjectLoaderInterface;
 use Psr\Container\ContainerInterface;
@@ -72,7 +73,8 @@ class ObjectReferenceSerializer implements DataSerializerInterface, ServiceSubsc
     public static function getSubscribedServices()
     {
         return [
-            MongoDocumentLoader::class
+            MongoDocumentLoader::class,
+            EntityManagerObjectLoader::class
         ];
     }
 }
