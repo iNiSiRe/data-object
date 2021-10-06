@@ -3,13 +3,13 @@
 namespace inisire\DataObject\Util;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use inisire\DataObject\Definition\TObjectReference;
 
 class EntityManagerObjectLoader implements ObjectLoaderInterface
 {
     public function __construct(
-        private EntityManager $manager)
+        private EntityManagerInterface $manager)
     {
     }
 
