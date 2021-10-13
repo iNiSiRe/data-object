@@ -4,10 +4,10 @@
 namespace inisire\DataObject\Util;
 
 
-use inisire\CQRS\Schema\Json;
-use inisire\CQRS\Schema\FormData;
-use inisire\CQRS\Schema\Schema;
-use inisire\CQRS\Schema\Stream;
+use inisire\RPC\Schema\Json;
+use inisire\RPC\Schema\FormData;
+use inisire\RPC\Schema\Schema;
+use inisire\RPC\Schema\Stream;
 use inisire\DataObject\Definition\Definition;
 use inisire\DataObject\Definition\TBoolean;
 use inisire\DataObject\Definition\TCollection;
