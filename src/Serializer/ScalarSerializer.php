@@ -49,6 +49,10 @@ class ScalarSerializer implements DataSerializerInterface
     public function serialize(Definition $type, mixed $data)
     {
         if ($type instanceof TEnum) {
+            if ($data === null) {
+                return null;
+            }
+
             return $type->isKeyAsLabel() ? array_flip($type->getOptions())[$data] : $data;
         } else {
             return $data;
@@ -58,6 +62,10 @@ class ScalarSerializer implements DataSerializerInterface
     public function deserialize(Definition $type, mixed $data, array &$errors = [])
     {
         if ($type instanceof TEnum) {
+            if ($data === null) {
+                return null;
+            }
+
             $filteredData = $this->filter($type->getType(), $data, $errors);
 
             if ($type->isKeyAsLabel()) {
