@@ -9,11 +9,10 @@ use inisire\DataObject\Definition\TObjectReference;
 
 class MongoDocumentLoader implements ObjectLoaderInterface
 {
-    private DocumentManager $manager;
-
-    public function __construct(DocumentManager $manager)
+    public function __construct(
+        private ?DocumentManager $manager = null
+    )
     {
-        $this->manager = $manager;
     }
 
     public function load(TObjectReference $definition, mixed $id): ?object
