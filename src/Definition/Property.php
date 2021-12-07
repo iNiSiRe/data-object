@@ -1,8 +1,9 @@
 <?php
 
-
 namespace inisire\DataObject\Definition;
 
+use Symfony\Component\PropertyInfo\PropertyReadInfo;
+use Symfony\Component\PropertyInfo\PropertyWriteInfo;
 
 class Property
 {
@@ -19,12 +20,18 @@ class Property
 
     private bool $readOnly;
 
-    public function __construct(string $name, Definition $definition, bool $allowNull = false, bool $readOnly = false)
+    /**
+     * @var array<string, PropertyReadInfo|PropertyWriteInfo>
+     */
+    private array $accessors = [];
+    
+    public function __construct(string $name, Definition $definition, bool $allowNull = false, bool $readOnly = false, array $accessors = [])
     {
         $this->name = $name;
         $this->definition = $definition;
         $this->allowNull = $allowNull;
         $this->readOnly = $readOnly;
+        $this->accessors = $accessors;
     }
 
     /**
@@ -62,5 +69,10 @@ class Property
     public function isReadOnly(): bool
     {
         return $this->readOnly;
+    }
+    
+    public function getReadInfo(): ?PropertyReadInfo
+    {
+        return $this->accessors['read'] ?? null;
     }
 }

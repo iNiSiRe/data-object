@@ -7,6 +7,7 @@ namespace inisire\DataObject\Util;
 use Doctrine\Common\Annotations\AnnotationReader;
 use inisire\DataObject\Definition\Annotation\Ignore;
 use inisire\DataObject\Definition\Annotation\Property;
+use inisire\DataObject\Definition\Annotation\TViewProperty;
 use inisire\DataObject\Definition\Definition;
 use inisire\DataObject\Definition\IObject;
 use inisire\DataObject\Definition\TBoolean;
@@ -18,6 +19,7 @@ use inisire\DataObject\Definition\TPartialObject;
 use inisire\DataObject\Definition\TString;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyReadInfo;
 
 class ObjectMetadataReader
 {
@@ -67,14 +69,6 @@ class ObjectMetadataReader
      */
     public function getProperties(object $object): array
     {
-        if ($object instanceof IObject) {
-            return $object->getObjectProperties();
-        }
-
-        if ($object instanceof TObject && is_a($object->getClass(), IObject::class, true)) {
-            return $object->getClass()::getObjectProperties();
-        }
-
         try {
             if ($object instanceof TObject || $object instanceof TPartialObject) {
                 $class = new \ReflectionClass($object->getClass());
@@ -109,13 +103,13 @@ class ObjectMetadataReader
             }
 
             if ($object instanceof TObject) {
-                $class = $object->getClass();
+                $className = $object->getClass();
             } else {
-                $class = $object::class;
+                $className = $object::class;
             }
 
-            $readable = $this->isReadable($class, $property->getName());
-            $writable = $this->isWritable($class, $property->getName());
+            $readable = $this->isReadable($className, $property->getName());
+            $writable = $this->isWritable($className, $property->getName());
 
             if ($readable === false && $writable === false) {
                 continue;
@@ -129,6 +123,25 @@ class ObjectMetadataReader
             );
 
             $properties[] = $property;
+        }
+
+        foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+            $view = $this->annotationReader->getMethodAnnotation($method, TViewProperty::class);
+
+            if (!$view) {
+                continue;
+            }
+
+            $properties[] = new \inisire\DataObject\Definition\Property(
+                $view->name,
+                $view->definition,
+                false,
+                true,
+                [
+                    'read' => new PropertyReadInfo(PropertyReadInfo::TYPE_METHOD, $method->getName(), PropertyReadInfo::VISIBILITY_PUBLIC, false, false),
+                    'write' => null
+                ]
+            );
         }
 
         return $properties;

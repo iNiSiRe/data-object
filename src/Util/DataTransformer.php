@@ -6,6 +6,7 @@ namespace inisire\DataObject\Util;
 
 use inisire\DataObject\Definition\Definition;
 use inisire\DataObject\Definition\IObject;
+use inisire\DataObject\Definition\Property;
 use inisire\DataObject\Definition\TBoolean;
 use inisire\DataObject\Definition\TCollection;
 use inisire\DataObject\Definition\TInteger;
@@ -19,6 +20,7 @@ use inisire\DataObject\Serializer\DateTimeSerializer;
 use inisire\DataObject\Serializer\DictionarySerializer;
 use inisire\DataObject\Serializer\ScalarSerializer;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyInfo\PropertyReadInfo;
 
 
 class DataTransformer
@@ -60,7 +62,21 @@ class DataTransformer
 
         throw new \RuntimeException(sprintf('Serializer for the type "%s" not exists', $type::class));
     }
-
+    
+    private function readValue(object $object, Property $property): mixed
+    {
+        $readInfo = $property->getReadInfo();
+        if ($readInfo !== null) {
+            $accessor = $readInfo->getName();
+            return match ($readInfo->getType()) {
+                PropertyReadInfo::TYPE_METHOD => $object->$accessor(),
+                PropertyReadInfo::TYPE_PROPERTY => $object->$accessor
+            };
+        } else {
+            return $this->accessor->getValue($object, $property->getName());   
+        }
+    }
+    
     public function object(?object $object, TObject|TPolymorphObject|null $type = null): ?array
     {
         if ($object === null) {
@@ -71,9 +87,8 @@ class DataTransformer
 
         foreach ($this->metadataReader->getProperties($object) as $property) {
             $propertyName = $property->getName();
-
-            if ($this->accessor->isReadable($object, $propertyName)) {
-                $data = $this->accessor->getValue($object, $propertyName);
+            if ($property->getReadInfo() !== null || $this->accessor->isReadable($object, $propertyName)) {
+                $data = $this->readValue($object, $property);
                 $container[$propertyName] = $this->any($data, $property->getType());
             } else {
                 $container[$propertyName] = null;
