@@ -70,7 +70,7 @@ class ObjectReferenceSerializer implements DataSerializerInterface, ServiceSubsc
         return $definition instanceof TObjectReference;
     }
 
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             MongoDocumentLoader::class,
