@@ -4,14 +4,14 @@
 namespace inisire\DataObject\Serializer;
 
 
-use inisire\DataObject\Definition\Definition;
-use inisire\DataObject\Definition\TDictionary;
+use inisire\DataObject\Schema\Type\Type;
+use inisire\DataObject\Schema\TDictionary;
 use inisire\DataObject\Error\Error;
-use inisire\DataObject\Errors;
+use inisire\DataObject\Error\Errors;
 
 class DictionarySerializer implements DataSerializerInterface
 {
-    public function serialize(Definition|TDictionary $type, mixed $data)
+    public function serialize(Type|TDictionary $type, mixed $data)
     {
         if ($data === null) {
             return null;
@@ -24,7 +24,7 @@ class DictionarySerializer implements DataSerializerInterface
         }
     }
 
-    public function deserialize(Definition|TDictionary $type, mixed $data, array &$errors = [])
+    public function deserialize(Type|TDictionary $type, mixed $data, array &$errors = [])
     {
         if ($data === null) {
             return null;
@@ -38,8 +38,8 @@ class DictionarySerializer implements DataSerializerInterface
         }
     }
 
-    public function isSupports(Definition $definition): bool
+    public function isSupports(Type $type): bool
     {
-        return $definition instanceof TDictionary;
+        return $type instanceof TDictionary;
     }
 }

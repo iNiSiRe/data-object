@@ -4,15 +4,14 @@
 namespace inisire\DataObject\Serializer;
 
 
-use inisire\DataObject\Definition\Definition;
-use inisire\DataObject\Definition\TBoolean;
-use inisire\DataObject\Definition\TEnum;
-use inisire\DataObject\Definition\TInteger;
-use inisire\DataObject\Definition\TMixed;
-use inisire\DataObject\Definition\TNumber;
-use inisire\DataObject\Definition\TString;
-use inisire\DataObject\Error\Error;
-use inisire\DataObject\Errors;
+use inisire\DataObject\Schema\Type\Type;
+use inisire\DataObject\Schema\Type\TBoolean;
+use inisire\DataObject\Schema\Type\TEnum;
+use inisire\DataObject\Schema\Type\TInteger;
+use inisire\DataObject\Schema\Type\TMixed;
+use inisire\DataObject\Schema\Type\TNumber;
+use inisire\DataObject\Schema\Type\TString;
+use inisire\DataObject\Error\Errors;
 
 class ScalarSerializer implements DataSerializerInterface
 {
@@ -30,9 +29,13 @@ class ScalarSerializer implements DataSerializerInterface
         'bool' => self::OPTIONS_BY_DEFINITION[TBoolean::class]
     ];
 
-    protected function filter(Definition $definition, mixed $data, array &$errors = [])
+    protected function filter(Type $type, mixed $data, array &$errors = [])
     {
-        $options = self::OPTIONS_BY_DEFINITION[$definition::class]
+        if ($data === null) {
+            return null;
+        }
+
+        $options = self::OPTIONS_BY_DEFINITION[$type::class]
             ?? self::OPTIONS_BY_TYPENAME[gettype($data)]
             ?? [FILTER_UNSAFE_RAW];
 
@@ -46,7 +49,7 @@ class ScalarSerializer implements DataSerializerInterface
         }
     }
 
-    public function serialize(Definition $type, mixed $data)
+    public function serialize(Type $type, mixed $data)
     {
         if ($type instanceof TEnum) {
             if ($data === null) {
@@ -59,7 +62,7 @@ class ScalarSerializer implements DataSerializerInterface
         }
     }
 
-    public function deserialize(Definition $type, mixed $data, array &$errors = [])
+    public function deserialize(Type $type, mixed $data, array &$errors = [])
     {
         if ($type instanceof TEnum) {
             if ($data === null) {
@@ -90,13 +93,13 @@ class ScalarSerializer implements DataSerializerInterface
         return $filteredData;
     }
 
-    public function isSupports(Definition $definition): bool
+    public function isSupports(Type $type): bool
     {
-        return $definition instanceof TString
-            || $definition instanceof TNumber
-            || $definition instanceof TInteger
-            || $definition instanceof TMixed
-            || $definition instanceof TEnum
-            || $definition instanceof TBoolean;
+        return $type instanceof TString
+            || $type instanceof TNumber
+            || $type instanceof TInteger
+            || $type instanceof TMixed
+            || $type instanceof TEnum
+            || $type instanceof TBoolean;
     }
 }

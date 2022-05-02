@@ -4,14 +4,14 @@
 namespace inisire\DataObject\Serializer;
 
 
-use inisire\DataObject\Definition\Definition;
-use inisire\DataObject\Definition\TDateTime;
+use inisire\DataObject\Schema\Type\Type;
+use inisire\DataObject\Schema\TDateTime;
 use inisire\DataObject\Error\Error;
-use inisire\DataObject\Errors;
+use inisire\DataObject\Error\Errors;
 
 class DateTimeSerializer implements DataSerializerInterface
 {
-    public function serialize(Definition|TDateTime $type, mixed $data)
+    public function serialize(Type|TDateTime $type, mixed $data)
     {
         if ($data === null) {
             return null;
@@ -24,7 +24,7 @@ class DateTimeSerializer implements DataSerializerInterface
         return $data->format($type->getFormat());
     }
 
-    public function deserialize(Definition|TDateTime $type, mixed $data, array &$errors = [])
+    public function deserialize(Type|TDateTime $type, mixed $data, array &$errors = [])
     {
         if ($data === null) {
             return null;
@@ -45,8 +45,8 @@ class DateTimeSerializer implements DataSerializerInterface
         return $result;
     }
 
-    public function isSupports(Definition $definition): bool
+    public function isSupports(Type $type): bool
     {
-        return $definition instanceof TDateTime;
+        return $type instanceof TDateTime;
     }
 }
