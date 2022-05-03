@@ -15,8 +15,8 @@ class Specification
             'tags' => $tags,
             'summary' => $summary,
             'parameters' => $parameters,
-            'requestBody' => $request,
-            'responses' => $responses
+            'requestBody' => (object) $request,
+            'responses' => (object) $responses
         ];
 
         $this->paths[$path][strtolower($method)] = $schema;

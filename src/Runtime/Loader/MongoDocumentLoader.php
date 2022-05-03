@@ -11,7 +11,7 @@ use inisire\DataObject\Schema\Type\TObjectReference;
 class MongoDocumentLoader implements ObjectLoaderInterface
 {
     public function __construct(
-        private DocumentManager $manager
+        private ?DocumentManager $manager
     )
     {
     }
