@@ -5,7 +5,7 @@ namespace inisire\DataObject\Serializer;
 
 
 use inisire\DataObject\Schema\Type\Type;
-use inisire\DataObject\Schema\TDateTime;
+use inisire\DataObject\Schema\Type\TDateTime;
 use inisire\DataObject\Error\Error;
 use inisire\DataObject\Error\Errors;
 
