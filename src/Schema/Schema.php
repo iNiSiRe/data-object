@@ -39,7 +39,7 @@ class Schema
             $type = $attribute?->getType();
 
             // Try to guess type
-            if ($type === null && $propertyReflection->hasType()) {
+            if ($type === null && $propertyReflection->hasType() && $propertyReflection->getType() instanceof \ReflectionNamedType) {
                 $type = TypeResolver::resolveByReflection($propertyReflection->getType());
             }
 
