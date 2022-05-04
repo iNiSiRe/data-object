@@ -5,8 +5,7 @@ namespace inisire\DataObject\Serializer;
 
 
 use inisire\DataObject\Schema\Type\Type;
-use inisire\DataObject\Schema\TDictionary;
-use inisire\DataObject\Error\Error;
+use inisire\DataObject\Schema\Type\TDictionary;
 use inisire\DataObject\Error\Errors;
 
 class DictionarySerializer implements DataSerializerInterface
