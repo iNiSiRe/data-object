@@ -9,7 +9,7 @@ use inisire\DataObject\Schema\Type\TObjectReference;
 class EntityManagerObjectLoader implements ObjectLoaderInterface
 {
     public function __construct(
-        private EntityManagerInterface $manager
+        private ?EntityManagerInterface $manager
     )
     {
     }
