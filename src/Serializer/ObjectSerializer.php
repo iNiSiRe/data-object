@@ -13,38 +13,42 @@ use inisire\DataObject\Schema\Type\TPartialObject;
 use inisire\DataObject\Schema\Type\TPolymorphObject;
 use inisire\DataObject\Schema\Type\Type;
 use inisire\DataObject\DataObjectWizard;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyReadInfo;
 
 class ObjectSerializer implements DataSerializerInterface
 {
+    private int $depth = 0;
+    private ?\SplObjectStorage $session;
+    private PropertyAccessor $accessor;
+
     public function __construct(
         private DataSerializerProvider $provider
     )
     {
-    }
-
-    private function readValue(object $object, Property $property): mixed
-    {
-        $readInfo = $property->getReadInfo();
-        $accessor = $readInfo->getName();
-
-        try {
-            $value = match ($readInfo->getType()) {
-                PropertyReadInfo::TYPE_METHOD => $object->$accessor(),
-                PropertyReadInfo::TYPE_PROPERTY => $object->$accessor,
-                default => throw new \RuntimeException('Unsupported accessor type')
-            };
-        } catch (\Error $exception) {
-            $value = null;
-        }
-
-        return $value;
+        $this->accessor = new PropertyAccessor();
     }
 
     public function serialize(Type $type, mixed $data)
     {
         if (!is_object($data)) {
             return null;
+        }
+
+        if ($this->depth++ === 0) {
+            $this->session = new \SplObjectStorage();
+        }
+
+        if ($this->session->contains($data)) {
+            if ($this->accessor->isReadable($data, 'id')) {
+                $id = $this->accessor->getValue($data, 'id');
+                $this->depth--;
+                return ['$ref' => $id];
+            } else {
+                throw new \RuntimeException(sprintf('Detected cyclic serialization for object "%s" which can not be simplified by $ref', $data::class));
+            }
+        } else {
+            $this->session->attach($data);
         }
 
         $serialized = [];
@@ -63,6 +67,10 @@ class ObjectSerializer implements DataSerializerInterface
         if ($type instanceof TPolymorphObject && $serialized !== []) {
             $discriminator = $type->getDiscriminator();
             $serialized[$discriminator->getProperty()] = array_flip($discriminator->getMap())[$data::class] ?? null;
+        }
+
+        if (--$this->depth == 0) {
+            $this->session = null;
         }
 
         return $serialized;
