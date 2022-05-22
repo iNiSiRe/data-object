@@ -49,7 +49,7 @@ class PropertyRuntime implements PropertyRuntimeInterface
         }
 
         if ($this->object instanceof \stdClass) {
-            $this->object->${$this->schema->getName()} = $data;
+            $this->object->{$this->schema->getName()} = $data;
         } else {
             $writeInfo = $this->schema->getWriteInfo();
 

@@ -12,6 +12,7 @@ use inisire\DataObject\Schema\Type\TCollection;
 use inisire\DataObject\Schema\Type\TInteger;
 use inisire\DataObject\Schema\Type\TNumber;
 use inisire\DataObject\Schema\Type\TObject;
+use inisire\DataObject\Schema\Type\TPartialObject;
 use inisire\DataObject\Schema\Type\TString;
 use inisire\DataObject\Serializer\CollectionSerializer;
 use inisire\DataObject\Serializer\DateTimeSerializer;
@@ -23,6 +24,21 @@ use PHPUnit\Framework\TestCase;
 
 class SchemaTest extends TestCase
 {
+    private function createProvider(): DataSerializerProvider
+    {
+        $provider = new DataSerializerProvider();
+        $provider->add([
+            new ScalarSerializer(),
+            new DictionarySerializer(),
+            new DateTimeSerializer(),
+            new FileSerializer(),
+            new ObjectSerializer($provider),
+            new CollectionSerializer($provider),
+        ]);
+
+        return $provider;
+    }
+
     public function testSchema()
     {
         $expected = [
@@ -66,16 +82,7 @@ class SchemaTest extends TestCase
         $foo->collection = [new Bar('bar#2'), new Bar('bar#3')];
         $foo->manual = 'manual';
 
-        $provider = new DataSerializerProvider();
-        $provider->add([
-            new ScalarSerializer(),
-            new DictionarySerializer(),
-            new DateTimeSerializer(),
-            new FileSerializer(),
-            new ObjectSerializer($provider),
-            new CollectionSerializer($provider),
-        ]);
-        $serializer = new DataObjectWizard($provider);
+        $serializer = new DataObjectWizard($this->createProvider());
 
         $actual = $serializer->transform(new TObject(Foo::class), $foo);
 
@@ -98,5 +105,24 @@ class SchemaTest extends TestCase
         );
 
         $specification = $builder->getSpecification()->toArray();
+    }
+
+    public function testPartialObject()
+    {
+        $serializer = new DataObjectWizard($this->createProvider());
+
+        $data = [
+            'text' => 'text',
+            'number' => 1
+        ];
+
+        $errors = [];
+        $result = $serializer->map(new TPartialObject(Foo::class), $data, $errors);
+
+        $expected = new \stdClass();
+        $expected->text = $data['text'];
+        $expected->number = $data['number'];
+
+        $this->assertEquals($expected, $result);
     }
 }
