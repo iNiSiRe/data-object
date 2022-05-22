@@ -14,11 +14,11 @@ class ObjectRuntime
      */
     private array $properties = [];
 
-    public static function create(object $object, DataSerializerProvider $provider): static
+    public static function create(object $object, Schema $schema, DataSerializerProvider $provider): static
     {
         $instance = new self();
 
-        foreach (Schema::ofClassName($object::class)->getProperties() as $property) {
+        foreach ($schema->getProperties() as $property) {
             $instance->properties[] = new PropertyRuntime($property, $object, $provider->getByType($property->getType()));
         }
 

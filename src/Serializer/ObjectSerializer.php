@@ -29,7 +29,7 @@ class ObjectSerializer implements DataSerializerInterface
         $this->accessor = new PropertyAccessor();
     }
 
-    public function serialize(Type $type, mixed $data)
+    public function serialize(Type|TObject|TPartialObject|TPolymorphObject $type, mixed $data)
     {
         if (!is_object($data)) {
             return null;
@@ -53,7 +53,9 @@ class ObjectSerializer implements DataSerializerInterface
 
         $serialized = [];
 
-        foreach (ObjectRuntime::create($data, $this->provider)->getProperties() as $property) {
+        $runtimeSchema = ObjectRuntime::create($data, Schema::ofClassName($type->getClass()), $this->provider);
+
+        foreach ($runtimeSchema->getProperties() as $property) {
             $schema = $property->getSchema();
             $name = $schema->getName();
 
@@ -124,7 +126,9 @@ class ObjectSerializer implements DataSerializerInterface
             throw new \InvalidArgumentException('Parameter $object should be TObject');
         }
 
-        foreach (ObjectRuntime::create($instance, $this->provider)->getProperties() as $property) {
+        $runtime = ObjectRuntime::create($instance, Schema::ofClassName($type->getClass()), $this->provider);
+
+        foreach ($runtime->getProperties() as $property) {
             $schema = $property->getSchema();
             $name = $schema->getName();
 
@@ -149,6 +153,6 @@ class ObjectSerializer implements DataSerializerInterface
 
     public function isSupports(Type $type): bool
     {
-        return $type instanceof TObject || $type instanceof TPolymorphObject;
+        return $type instanceof TObject || $type instanceof TPolymorphObject || $type instanceof TPartialObject;
     }
 }
