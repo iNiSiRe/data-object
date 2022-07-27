@@ -78,6 +78,23 @@ class ObjectSerializer implements DataSerializerInterface
         return $serialized;
     }
 
+    private function createInstance(TObject $type): ?object
+    {
+        $reflection = new \ReflectionClass($type->getClass());
+
+        if ($reflection->getConstructor()->getNumberOfRequiredParameters() === 0) {
+            $instance = new ($type->getClass())();
+        } else {
+            $instance = $reflection->newInstanceWithoutConstructor();
+        }
+
+        if (method_exists($instance, '__wakeup')) {
+            $instance->__wakeup();
+        }
+
+        return $instance;
+    }
+
     public function deserialize(Type $type, mixed $data, array &$errors = [])
     {
         if ($data === null) {
@@ -94,7 +111,7 @@ class ObjectSerializer implements DataSerializerInterface
         }
 
         if ($type instanceof TObject) {
-            $instance = $type->createInstance();
+            $instance = $this->createInstance($type);
         } elseif ($type instanceof TPartialObject) {
             $instance = new \stdClass();
             $type = new TObject($type->getClass());

@@ -17,9 +17,4 @@ class TObject implements Type
     {
         return $this->class;
     }
-
-    public function createInstance(): object
-    {
-        return new $this->class();
-    }
 }
