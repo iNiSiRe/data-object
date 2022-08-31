@@ -9,7 +9,9 @@ use inisire\DataObject\Schema\Type\TInteger;
 use inisire\DataObject\Schema\Type\TNumber;
 use inisire\DataObject\Schema\Type\TObject;
 use inisire\DataObject\Schema\Type\TString;
+use inisire\DataObject\Schema\Type\TUuid;
 use inisire\DataObject\Schema\Type\Type;
+use Symfony\Component\Uid\Uuid;
 
 class TypeResolver
 {
@@ -17,18 +19,18 @@ class TypeResolver
     {
         $typeName = $type->getName();
 
-        if ($type->isBuiltin()) {
-            return match ($typeName) {
-                'string' => new TString(),
-                'int' => new TInteger(),
-                'float' => new TNumber(),
-                'bool' => new TBoolean(),
-                default => null
-            };
-        }
+        $resolved = match ($typeName) {
+            'string' => new TString(),
+            'int' => new TInteger(),
+            'float' => new TNumber(),
+            'bool' => new TBoolean(),
+            \DateTime::class, \DateTimeImmutable::class => new TDateTime(),
+            Uuid::class => new TUuid(),
+            default => null
+        };
 
-        if ($typeName == \DateTime::class) {
-            return new TDateTime();
+        if ($resolved !== null) {
+            return $resolved;
         }
 
         if (enum_exists($typeName)) {
