@@ -41,7 +41,7 @@ class ObjectMetadataReader
             'int' => new TInteger(),
             'float' => new TNumber(),
             'bool' => new TBoolean(),
-            \DateTime::class => new TDateTime(),
+            \DateTime::class, \DateTimeImmutable::class => new TDateTime(),
             default => null
         };
 
