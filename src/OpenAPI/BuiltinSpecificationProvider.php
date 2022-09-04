@@ -10,6 +10,7 @@ use inisire\DataObject\Schema\Type\TFile;
 use inisire\DataObject\Schema\Type\TInteger;
 use inisire\DataObject\Schema\Type\TNumber;
 use inisire\DataObject\Schema\Type\TString;
+use inisire\DataObject\Schema\Type\TUuid;
 use inisire\DataObject\Schema\Type\Type;
 
 
@@ -31,7 +32,11 @@ class BuiltinSpecificationProvider implements SpecificationProviderInterface
                 'type' => 'string',
                 'format' => 'binary'
         ],
-        TBoolean::class => ['type' => 'boolean']
+        TBoolean::class => ['type' => 'boolean'],
+        TUuid::class => [
+            'type' => 'string',
+            'format' => 'uuid'
+        ]
     ];
 
     public function isTypeSupported(Type $type): bool
