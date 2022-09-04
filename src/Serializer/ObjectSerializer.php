@@ -82,7 +82,7 @@ class ObjectSerializer implements DataSerializerInterface
     {
         $reflection = new \ReflectionClass($type->getClass());
 
-        if ($reflection->getConstructor()->getNumberOfRequiredParameters() === 0) {
+        if ($reflection->getConstructor() === null || $reflection->getConstructor()->getNumberOfRequiredParameters() === 0) {
             $instance = new ($type->getClass())();
         } else {
             $instance = $reflection->newInstanceWithoutConstructor();
