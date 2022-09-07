@@ -24,7 +24,7 @@ class TypeResolver
             'int' => new TInteger(),
             'float' => new TNumber(),
             'bool' => new TBoolean(),
-            \DateTime::class, \DateTimeImmutable::class => new TDateTime(),
+            \DateTime::class, \DateTimeImmutable::class, \DateTimeInterface::class => new TDateTime(),
             Uuid::class => new TUuid(),
             default => null
         };
