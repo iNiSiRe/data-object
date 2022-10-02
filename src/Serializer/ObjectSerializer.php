@@ -53,7 +53,12 @@ class ObjectSerializer implements DataSerializerInterface
 
         $serialized = [];
 
-        $runtimeSchema = ObjectRuntime::create($data, Schema::ofClassName($type->getClass()), $this->provider);
+        if ($type instanceof TPolymorphObject) {
+            // TODO: Validate $data::class belongs to discriminator map
+            $runtimeSchema = ObjectRuntime::create($data, Schema::ofClassName($data::class), $this->provider);
+        } else {
+            $runtimeSchema = ObjectRuntime::create($data, Schema::ofClassName($type->getClass()), $this->provider);
+        }
 
         foreach ($runtimeSchema->getProperties() as $property) {
             $schema = $property->getSchema();

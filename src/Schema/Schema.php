@@ -16,20 +16,45 @@ use Symfony\Component\PropertyInfo\PropertyReadInfo;
 
 class Schema
 {
+    private function __construct(
+        private \ReflectionClass $reflection
+    )
+    {
+    }
+
     /**
-     * @var array<Property>
+     * @return iterable<\ReflectionProperty>
      */
-    private array $properties = [];
+    private function extractClassProperties(\ReflectionClass $class): iterable
+    {
+        foreach ($class->getProperties() as $property) {
+            yield $property;
+        }
+
+        while ($class->getParentClass() !== false) {
+            $class = $class->getParentClass();
+
+            foreach ($class->getProperties() as $property) {
+                yield $property;
+            }
+        }
+    }
 
     public static function ofClassName(string $class): static
     {
+        return new static(new \ReflectionClass($class));
+    }
+
+    /**
+     * @return iterable<Property>
+     */
+    public function getProperties(): iterable
+    {
         $reflectionExtractor = new ReflectionExtractor();
 
-        $instance = new self();
+        $classReflection = $this->reflection;
 
-        $classReflection = new \ReflectionClass($class);
-
-        foreach ($classReflection->getProperties() as $propertyReflection) {
+        foreach ($this->extractClassProperties($classReflection) as $propertyReflection) {
             if (AttributeExtractor::hasAttribute($propertyReflection, Attribute\IgnoreProperty::class)) {
                 continue;
             }
@@ -48,8 +73,8 @@ class Schema
             }
 
             $nullable = !$propertyReflection->hasType() || $propertyReflection->getType()->allowsNull();
-            $readInfo = $reflectionExtractor->getReadInfo($class, $propertyReflection->getName());
-            $writeInfo = $reflectionExtractor->getWriteInfo($class, $propertyReflection->getName(), ['enable_constructor_extraction' => false]);
+            $readInfo = $reflectionExtractor->getReadInfo($classReflection->getName(), $propertyReflection->getName());
+            $writeInfo = $reflectionExtractor->getWriteInfo($classReflection->getName(), $propertyReflection->getName(), ['enable_constructor_extraction' => false]);
             $default = $propertyReflection->getDefaultValue();
 
             if ($writeInfo && $writeInfo->getType() == 'none') {
@@ -60,7 +85,7 @@ class Schema
                 continue;
             }
 
-            $instance->properties[] = new Property($propertyReflection->getName(), $type, $nullable, $default, $readInfo, $writeInfo);
+            yield new Property($propertyReflection->getName(), $type, $nullable, $default, $readInfo, $writeInfo);
         }
 
         foreach ($classReflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
@@ -72,17 +97,7 @@ class Schema
 
             $readInfo = new PropertyReadInfo(PropertyReadInfo::TYPE_METHOD, $method->getName(), PropertyReadInfo::VISIBILITY_PUBLIC, false, false);
 
-            $instance->properties[] = new Property($attribute->getName(), $attribute->getType(), false, null, $readInfo);
+            yield new Property($attribute->getName(), $attribute->getType(), false, null, $readInfo);
         }
-
-        return $instance;
-    }
-
-    /**
-     * @return Property[]
-     */
-    public function getProperties(): array
-    {
-        return $this->properties;
     }
 }
