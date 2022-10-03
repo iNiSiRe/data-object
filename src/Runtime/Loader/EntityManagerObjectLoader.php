@@ -17,7 +17,7 @@ class EntityManagerObjectLoader implements ObjectLoaderInterface
 
     public function load(TObjectReference $type, mixed $id): ?object
     {
-        return $this->doctrine->getRepository($type->getObject()->getClass(), $type->getManagerName());
+        return $this->doctrine->getRepository($type->getObject()->getClass(), $type->getManagerName())->find($id);
     }
 
     public function getAlias(): string
