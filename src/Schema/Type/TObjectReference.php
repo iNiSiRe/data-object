@@ -10,6 +10,7 @@ class TObjectReference implements Type
         private Type    $referenceType,
         private TObject $object,
         private string  $loaderName,
+        private ?string  $managerName = null,
     )
     {
     }
@@ -27,5 +28,10 @@ class TObjectReference implements Type
     public function getLoaderName(): string
     {
         return $this->loaderName;
+    }
+
+    public function getManagerName(): ?string
+    {
+        return $this->managerName;
     }
 }
