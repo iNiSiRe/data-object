@@ -20,12 +20,16 @@ class FileSerializer implements DataSerializerInterface
 
     public function deserialize(Type $type, mixed $data, array &$errors = [])
     {
-        if ($data instanceof File) {
-            return $data;
-        } else {
+        if ($data === null) {
+            return null;
+        }
+
+        if (!$data instanceof File) {
             $errors[] = Errors::create(Errors::INVALID_FILE);
             return null;
         }
+
+        return $data;
     }
 
     public function isSupports(Type $type): bool
