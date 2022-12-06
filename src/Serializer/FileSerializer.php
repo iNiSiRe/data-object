@@ -20,7 +20,7 @@ class FileSerializer implements DataSerializerInterface
 
     public function deserialize(Type $type, mixed $data, array &$errors = [])
     {
-        if ($data === null) {
+        if (empty($data)) {
             return null;
         }
 
