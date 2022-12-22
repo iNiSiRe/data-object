@@ -24,7 +24,7 @@ class UuidSerializer implements DataSerializerInterface
 
     public function deserialize(Type $type, mixed $data, array &$errors = [])
     {
-        if ($data === null) {
+        if ($data === null || $data === '') {
             return null;
         }
 

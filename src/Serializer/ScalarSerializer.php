@@ -31,7 +31,7 @@ class ScalarSerializer implements DataSerializerInterface
 
     protected function filter(Type $type, mixed $data, array &$errors = [])
     {
-        if ($data === null) {
+        if ($data === null || $data === '') {
             return null;
         }
 
@@ -41,7 +41,7 @@ class ScalarSerializer implements DataSerializerInterface
 
         $filtered = filter_var($data, $options[0], ($options[1] ?? null) | FILTER_NULL_ON_FAILURE);
 
-        if ($data !== null && $filtered === null) {
+        if ($filtered === null) {
             $errors[] = Errors::create(Errors::INVALID_SCALAR);
             return null;
         } else {
