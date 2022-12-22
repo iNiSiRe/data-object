@@ -92,14 +92,4 @@ class ScalarSerializer implements DataSerializerInterface
 
         return $filteredData;
     }
-
-    public function isSupports(Type $type): bool
-    {
-        return $type instanceof TString
-            || $type instanceof TNumber
-            || $type instanceof TInteger
-            || $type instanceof TMixed
-            || $type instanceof TEnum
-            || $type instanceof TBoolean;
-    }
 }

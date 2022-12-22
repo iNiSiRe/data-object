@@ -36,9 +36,4 @@ class DictionarySerializer implements DataSerializerInterface
             return null;
         }
     }
-
-    public function isSupports(Type $type): bool
-    {
-        return $type instanceof TDictionary;
-    }
 }

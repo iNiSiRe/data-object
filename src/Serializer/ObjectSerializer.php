@@ -172,9 +172,4 @@ class ObjectSerializer implements DataSerializerInterface
 
         return $instance;
     }
-
-    public function isSupports(Type $type): bool
-    {
-        return $type instanceof TObject || $type instanceof TPolymorphObject || $type instanceof TPartialObject;
-    }
 }

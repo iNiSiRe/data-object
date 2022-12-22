@@ -18,12 +18,10 @@ use inisire\DataObject\Schema\Type\TObject;
 class SpecificationBuilder
 {
     private Specification $specification;
-    private SpecificationProviderInterface $specificationProvider;
 
-    public function __construct(SpecificationProviderInterface $specificationProvider = null)
+    public function __construct()
     {
         $this->specification = new Specification();
-        $this->specificationProvider = $specificationProvider ?? new BuiltinSpecificationProvider();
     }
 
     private function createMixedSchema(TMixed $type): array
@@ -57,11 +55,11 @@ class SpecificationBuilder
             return $schema;
         }
 
-        if (!$this->specificationProvider->isTypeSupported($type)) {
+        if (!$type instanceof \inisire\DataObject\OpenAPI\Type) {
             throw new \RuntimeException(sprintf('Unsupported type "%s"', $type::class));
         }
 
-        return $this->specificationProvider->createTypeSchema($type);
+        return $type->getSchema();
     }
 
     public function createObjectSchema(TObject $type): array

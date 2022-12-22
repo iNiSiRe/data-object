@@ -44,9 +44,4 @@ class DateTimeSerializer implements DataSerializerInterface
 
         return $result;
     }
-
-    public function isSupports(Type $type): bool
-    {
-        return $type instanceof TDateTime;
-    }
 }

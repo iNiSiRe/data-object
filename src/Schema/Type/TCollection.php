@@ -1,7 +1,8 @@
 <?php
 
-
 namespace inisire\DataObject\Schema\Type;
+
+use inisire\DataObject\Serializer\CollectionSerializer;
 
 
 class TCollection implements Type
@@ -23,5 +24,10 @@ class TCollection implements Type
     public function getEntry(): Type
     {
         return $this->entry;
+    }
+
+    public function getSerializer(): string
+    {
+        return CollectionSerializer::class;
     }
 }

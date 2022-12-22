@@ -5,6 +5,7 @@ namespace inisire\DataObject\Schema\Type;
 
 
 use inisire\DataObject\Schema\Discriminator;
+use inisire\DataObject\Serializer\ObjectSerializer;
 
 class TPolymorphObject implements Type
 {
@@ -41,5 +42,10 @@ class TPolymorphObject implements Type
     public function getDiscriminator(): Discriminator
     {
         return $this->discriminator;
+    }
+
+    public function getSerializer(): string
+    {
+        return ObjectSerializer::class;
     }
 }

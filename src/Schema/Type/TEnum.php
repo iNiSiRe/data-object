@@ -2,7 +2,8 @@
 
 namespace inisire\DataObject\Schema\Type;
 
-class TEnum implements TPrimitive
+
+class TEnum extends TPrimitive
 {
     public function __construct(
         private Type  $type,

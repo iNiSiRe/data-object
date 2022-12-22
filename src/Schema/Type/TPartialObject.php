@@ -4,6 +4,8 @@
 namespace inisire\DataObject\Schema\Type;
 
 
+use inisire\DataObject\Serializer\ObjectSerializer;
+
 class TPartialObject implements Type
 {
     private string $class;
@@ -16,5 +18,10 @@ class TPartialObject implements Type
     public function getClass(): string
     {
         return $this->class;
+    }
+
+    public function getSerializer(): string
+    {
+        return ObjectSerializer::class;
     }
 }

@@ -35,9 +35,4 @@ class UuidSerializer implements DataSerializerInterface
 
         return Uuid::fromString($data);
     }
-
-    public function isSupports(Type $type): bool
-    {
-        return $type instanceof TUuid;
-    }
 }

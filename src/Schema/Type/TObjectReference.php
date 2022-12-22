@@ -4,6 +4,8 @@
 namespace inisire\DataObject\Schema\Type;
 
 
+use inisire\DataObject\Serializer\ObjectReferenceSerializer;
+
 class TObjectReference implements Type
 {
     public function __construct(
@@ -33,5 +35,10 @@ class TObjectReference implements Type
     public function getManagerName(): ?string
     {
         return $this->managerName;
+    }
+
+    public function getSerializer(): string
+    {
+        return ObjectReferenceSerializer::class;
     }
 }

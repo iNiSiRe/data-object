@@ -41,12 +41,6 @@ class DataSerializerProvider
 
     public function getByType(Type $type): ?DataSerializerInterface
     {
-        foreach ($this->serializers as $serializer) {
-            if ($serializer->isSupports($type)) {
-                return $serializer;
-            }
-        }
-
-        return null;
+        return $this->getByName($type->getSerializer());
     }
 }

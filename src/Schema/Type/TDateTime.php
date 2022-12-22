@@ -1,10 +1,11 @@
 <?php
 
-
 namespace inisire\DataObject\Schema\Type;
 
+use inisire\DataObject\Serializer\DateTimeSerializer;
 
-class TDateTime implements TPrimitive
+
+class TDateTime implements Type, \inisire\DataObject\OpenAPI\Type
 {
     private string $format;
 
@@ -19,5 +20,18 @@ class TDateTime implements TPrimitive
     public function getFormat(): string
     {
         return $this->format;
+    }
+
+    public function getSchema(): array
+    {
+        return [
+            'type' => 'string',
+            'format' => 'date-time'
+        ];
+    }
+
+    public function getSerializer(): string
+    {
+        return DateTimeSerializer::class;
     }
 }

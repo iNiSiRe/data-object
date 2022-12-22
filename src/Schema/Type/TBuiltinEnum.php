@@ -2,7 +2,8 @@
 
 namespace inisire\DataObject\Schema\Type;
 
-class TBuiltinEnum implements Type
+// TODO
+class TBuiltinEnum
 {
     public function __construct(
         private string $enum

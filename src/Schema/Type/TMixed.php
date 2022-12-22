@@ -4,7 +4,7 @@
 namespace inisire\DataObject\Schema\Type;
 
 
-class TMixed implements Type
+class TMixed extends TPrimitive
 {
     private array $types;
 

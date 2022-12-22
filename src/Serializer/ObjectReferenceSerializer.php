@@ -65,9 +65,4 @@ class ObjectReferenceSerializer implements DataSerializerInterface
 
         return $result;
     }
-
-    public function isSupports(Type $type): bool
-    {
-        return $type instanceof TObjectReference;
-    }
 }

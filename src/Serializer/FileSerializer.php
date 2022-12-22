@@ -31,9 +31,4 @@ class FileSerializer implements DataSerializerInterface
 
         return $data;
     }
-
-    public function isSupports(Type $type): bool
-    {
-        return $type instanceof TFile;
-    }
 }

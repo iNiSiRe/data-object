@@ -60,9 +60,4 @@ class CollectionSerializer implements DataSerializerInterface
 
         return $container;
     }
-
-    public function isSupports(Type $type): bool
-    {
-        return $type instanceof TCollection;
-    }
 }
