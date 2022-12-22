@@ -26,7 +26,7 @@ class DateTimeSerializer implements DataSerializerInterface
 
     public function deserialize(Type|TDateTime $type, mixed $data, array &$errors = [])
     {
-        if ($data === null) {
+        if (empty($data)) {
             return null;
         }
 
