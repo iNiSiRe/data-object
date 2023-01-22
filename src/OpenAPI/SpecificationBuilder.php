@@ -4,6 +4,7 @@
 namespace inisire\DataObject\OpenAPI;
 
 
+use inisire\DataObject\Schema\Property;
 use inisire\DataObject\Schema\Schema;
 use inisire\DataObject\Schema\Type\Type;
 use inisire\DataObject\Schema\Type\TCollection;
@@ -62,6 +63,28 @@ class SpecificationBuilder
         return $type->getSchema();
     }
 
+    private function createPropertySchema(Property $property): array
+    {
+        $type = $property->getType();
+        $schema = $this->createTypeSpecification($type);
+
+        if (!$type instanceof TObject) {
+            if ($property->isNullable()) {
+                $schema['nullable'] = $property->isNullable();
+            }
+
+            if ($property->isReadOnly()) {
+                $schema['readOnly'] = $property->isReadOnly();
+            }
+
+            if (null !== $default = $property->getDefault()) {
+                $schema['default'] = $default;
+            }
+        }
+
+        return $schema;
+    }
+
     public function createObjectSchema(TObject $type): array
     {
         $parts = explode('\\', $type->getClass());
@@ -75,34 +98,21 @@ class SpecificationBuilder
         $required = [];
 
         foreach (Schema::ofClassName($type->getClass())->getProperties() as $property) {
-            $propertyType = $property->getType();
-
-            $schema = $this->createTypeSpecification($propertyType);
-
-            if ($property->isNullable()) {
-                $schema['nullable'] = $property->isNullable();
-            }
-
-            if ($property->isReadOnly()) {
-                $schema['readOnly'] = $property->isReadOnly();
-            }
-
-            if (null !== $default = $property->getDefault()) {
-                $schema['default'] = $default;
-            }
+            $properties[$property->getName()] = $this->createPropertySchema($property);
 
             if ($property->isRequired()) {
                 $required[] = $property->getName();
             }
-
-            $properties[$property->getName()] = $schema;
         }
 
         $schema = [
-            'type' => 'object',
-            'properties' => $properties,
-            'required' => $required
+            'type' => 'object'
         ];
+
+        if (!empty($properties)) {
+            $schema['properties'] = $properties;
+            $schema['required'] = $required;
+        }
 
         $this->specification->addSchema($name, $schema);
 

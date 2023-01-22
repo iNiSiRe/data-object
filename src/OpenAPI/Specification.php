@@ -14,10 +14,16 @@ class Specification
         $schema = [
             'tags' => $tags,
             'summary' => $summary,
-            'parameters' => $parameters,
-            'requestBody' => (object) $request,
-            'responses' => (object) $responses
+            'parameters' => $parameters
         ];
+
+        if (!empty($request)) {
+            $schema['requestBody'] = (object) $request;
+        }
+
+        if (!empty($responses)) {
+            $schema['responses'] = (object) $responses;
+        }
 
         $this->paths[$path][strtolower($method)] = $schema;
     }
