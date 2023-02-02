@@ -18,8 +18,12 @@ class CollectionSerializer implements DataSerializerInterface
 
     public function serialize(Type|TCollection $type, mixed $data)
     {
-        if ($data === null || $data === []) {
-            return $data;
+        if ($data === null) {
+            return null;
+        }
+
+        if ($data === [] || $data === '') {
+            return [];
         }
 
         $serializer = $this->provider->getByType($type->getEntry());
