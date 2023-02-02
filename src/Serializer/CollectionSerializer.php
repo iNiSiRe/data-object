@@ -18,12 +18,8 @@ class CollectionSerializer implements DataSerializerInterface
 
     public function serialize(Type|TCollection $type, mixed $data)
     {
-        if ($data === null) {
-            return null;
-        }
-
-        if ($data === [] || $data === '') {
-            return [];
+        if ($data === null || $data === []) {
+            return $data;
         }
 
         $serializer = $this->provider->getByType($type->getEntry());
@@ -41,6 +37,11 @@ class CollectionSerializer implements DataSerializerInterface
     {
         if ($data === null) {
             return null;
+        }
+
+        // Convert '' to [] because it's how FormData works when request contains property with an empty array value
+        if ($data === [] || $data === '') {
+            return [];
         }
 
         if (!is_array($data)) {
