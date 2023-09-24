@@ -34,7 +34,7 @@ class Schema
         while ($class->getParentClass() !== false) {
             $class = $class->getParentClass();
 
-            foreach ($class->getProperties() as $property) {
+            foreach ($class->getProperties(\ReflectionProperty::IS_PRIVATE) as $property) {
                 yield $property;
             }
         }
