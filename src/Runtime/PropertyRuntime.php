@@ -39,7 +39,7 @@ class PropertyRuntime implements PropertyRuntimeInterface
         }
         
         if ($this->serializing) {
-            throw new \RuntimeException(sprintf('Detected cyclic serialization for object "%s" which can not be simplified by $ref', $data::class));
+            throw new \RuntimeException(sprintf('Detected cyclic serialization for %s::%s', $this->object::class, $this->schema->getName()));
         }
         
         $this->serializing = true;
