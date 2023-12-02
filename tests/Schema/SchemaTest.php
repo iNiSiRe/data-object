@@ -69,7 +69,7 @@ class SchemaTest extends TestCase
             'object' => ['name' => 'bar#1'],
             'public' => 1,
             'nullable' => null,
-            'collection' => [['name' => 'bar#2'], ['name' => 'bar#3']],
+            'collection' => [['name' => 'bar#2'], ['name' => 'bar#2'], ['name' => 'bar#3']],
             'manual' => 'manual',
             'view' => 'test'
         ];
@@ -79,7 +79,10 @@ class SchemaTest extends TestCase
         $foo->number = 1;
         $foo->object = new Bar('bar#1');
         $foo->public = 1;
-        $foo->collection = [new Bar('bar#2'), new Bar('bar#3')];
+
+        $bar = new Bar('bar#2');
+
+        $foo->collection = [$bar, $bar, new Bar('bar#3')];
         $foo->manual = 'manual';
 
         $serializer = new DataObjectWizard($this->createProvider());

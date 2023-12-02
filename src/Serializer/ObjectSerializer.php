@@ -18,47 +18,48 @@ use Symfony\Component\PropertyInfo\PropertyReadInfo;
 
 class ObjectSerializer implements DataSerializerInterface
 {
-    private int $depth = 0;
-    private ?\SplObjectStorage $session;
-    private PropertyAccessor $accessor;
+    /**
+     * @var \SplObjectStorage<ObjectRuntime>
+     */
+    private \SplObjectStorage $objects;
 
+    private PropertyAccessor $accessor;
+    
     public function __construct(
         private DataSerializerProvider $provider
     )
     {
         $this->accessor = new PropertyAccessor();
+        $this->objects = new \SplObjectStorage();
     }
 
+    private function createObjectRuntime(object $object, Type $type): ObjectRuntime
+    {
+        if ($this->objects->contains($object)) {
+            return $this->objects[$object];
+        }
+        
+        if ($type instanceof TPolymorphObject) {
+            // TODO: Validate $data::class belongs to discriminator map
+            $runtimeSchema = ObjectRuntime::create($object, Schema::ofClassName($object::class), $this->provider);
+        } else {
+            $runtimeSchema = ObjectRuntime::create($object, Schema::ofClassName($type->getClass()), $this->provider);
+        }
+        
+        $this->objects[$object] = $runtimeSchema;
+        
+        return $runtimeSchema;
+    }
+    
     public function serialize(Type|TObject|TPartialObject|TPolymorphObject $type, mixed $data)
     {
         if (!is_object($data)) {
             return null;
         }
 
-        if ($this->depth++ === 0) {
-            $this->session = new \SplObjectStorage();
-        }
-
-        if ($this->session->contains($data)) {
-            if ($this->accessor->isReadable($data, 'id')) {
-                $id = $this->accessor->getValue($data, 'id');
-                $this->depth--;
-                return ['$ref' => $id];
-            } else {
-                throw new \RuntimeException(sprintf('Detected cyclic serialization for object "%s" which can not be simplified by $ref', $data::class));
-            }
-        } else {
-            $this->session->attach($data);
-        }
-
         $serialized = [];
 
-        if ($type instanceof TPolymorphObject) {
-            // TODO: Validate $data::class belongs to discriminator map
-            $runtimeSchema = ObjectRuntime::create($data, Schema::ofClassName($data::class), $this->provider);
-        } else {
-            $runtimeSchema = ObjectRuntime::create($data, Schema::ofClassName($type->getClass()), $this->provider);
-        }
+        $runtimeSchema = $this->createObjectRuntime($data, $type);
 
         foreach ($runtimeSchema->getProperties() as $property) {
             $schema = $property->getSchema();
@@ -74,10 +75,6 @@ class ObjectSerializer implements DataSerializerInterface
         if ($type instanceof TPolymorphObject && $serialized !== []) {
             $discriminator = $type->getDiscriminator();
             $serialized[$discriminator->getProperty()] = array_flip($discriminator->getMap())[$data::class] ?? null;
-        }
-
-        if (--$this->depth == 0) {
-            $this->session = null;
         }
 
         return $serialized;

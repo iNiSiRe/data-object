@@ -13,6 +13,8 @@ class PropertyRuntime implements PropertyRuntimeInterface
 {
     private array $errors = [];
 
+    private bool $serializing = false;
+    
     public function __construct(
         protected Property $schema,
         protected object $object,
@@ -35,8 +37,16 @@ class PropertyRuntime implements PropertyRuntimeInterface
         } catch (\Error) {
             return null;
         }
-
-        return $this->serializer->serialize($this->schema->getType(), $value);
+        
+        if ($this->serializing) {
+            throw new \RuntimeException(sprintf('Detected cyclic serialization for object "%s" which can not be simplified by $ref', $data::class));
+        }
+        
+        $this->serializing = true;
+        $result = $this->serializer->serialize($this->schema->getType(), $value);
+        $this->serializing = false;
+        
+        return $result;
     }
 
     public function setValue(mixed $value): void
