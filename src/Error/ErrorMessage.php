@@ -54,7 +54,7 @@ class ErrorMessage implements \JsonSerializable
             : $this->getValue();
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->serialize();
     }
