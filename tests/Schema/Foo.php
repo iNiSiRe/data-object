@@ -21,6 +21,8 @@ class Foo
 
     public ?string $nullable = null;
 
+    public Baz $enum;
+
     /**
      * @var array<Bar>
      */

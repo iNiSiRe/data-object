@@ -8,6 +8,7 @@ use inisire\DataObject\OpenAPI\RequestSchema;
 use inisire\DataObject\OpenAPI\ResponseSchema;
 use inisire\DataObject\OpenAPI\SpecificationBuilder;
 use inisire\DataObject\Schema\Schema;
+use inisire\DataObject\Schema\Type\TBuiltinEnum;
 use inisire\DataObject\Schema\Type\TCollection;
 use inisire\DataObject\Schema\Type\TInteger;
 use inisire\DataObject\Schema\Type\TNumber;
@@ -49,7 +50,8 @@ class SchemaTest extends TestCase
             'nullable' => new TString(),
             'collection' => new TCollection(new TObject(Bar::class)),
             'manual' => new TString(),
-            'view' => new TString()
+            'view' => new TString(),
+            'enum' => new TBuiltinEnum(Baz::class),
         ];
 
         $actual = [];
@@ -69,6 +71,7 @@ class SchemaTest extends TestCase
             'object' => ['name' => 'bar#1'],
             'public' => 1,
             'nullable' => null,
+            'enum' => 'foo',
             'collection' => [['name' => 'bar#2'], ['name' => 'bar#2'], ['name' => 'bar#3']],
             'manual' => 'manual',
             'view' => 'test'
@@ -79,6 +82,7 @@ class SchemaTest extends TestCase
         $foo->number = 1;
         $foo->object = new Bar('bar#1');
         $foo->public = 1;
+        $foo->enum = Baz::Foo;
 
         $bar = new Bar('bar#2');
 

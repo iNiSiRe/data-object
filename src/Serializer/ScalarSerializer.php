@@ -6,6 +6,7 @@ namespace inisire\DataObject\Serializer;
 
 use inisire\DataObject\Schema\Type\Type;
 use inisire\DataObject\Schema\Type\TBoolean;
+use inisire\DataObject\Schema\Type\TBuiltinEnum;
 use inisire\DataObject\Schema\Type\TEnum;
 use inisire\DataObject\Schema\Type\TInteger;
 use inisire\DataObject\Schema\Type\TMixed;
@@ -57,6 +58,16 @@ class ScalarSerializer implements DataSerializerInterface
             }
 
             return $type->isKeyAsLabel() ? array_flip($type->getOptions())[$data] : $data;
+        } elseif ($type instanceof TBuiltinEnum) {
+            if ($data === null) {
+                return null;
+            }
+
+            if (!$data instanceof \BackedEnum) {
+                return null;
+            }
+
+            return $data->value;
         } else {
             return $data;
         }
@@ -85,6 +96,15 @@ class ScalarSerializer implements DataSerializerInterface
                     $errors[] = Errors::create(Errors::INVALID_ENUM);
                     $filteredData = null;
                 }
+            }
+        } elseif ($type instanceof TBuiltinEnum) {
+            if ($data === null) {
+                return null;
+            }
+
+            $filteredData = $this->filter($type->getType(), $data, $errors);
+            if (null === $filteredData = $type->getEnum()::tryFrom($filteredData)) {
+                $errors[] = Errors::create(Errors::INVALID_ENUM);
             }
         } else {
             $filteredData = $this->filter($type, $data, $errors);

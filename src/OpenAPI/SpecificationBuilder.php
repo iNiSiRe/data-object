@@ -7,6 +7,7 @@ namespace inisire\DataObject\OpenAPI;
 use inisire\DataObject\Schema\Property;
 use inisire\DataObject\Schema\Schema;
 use inisire\DataObject\Schema\Type\Type;
+use inisire\DataObject\Schema\Type\TBuiltinEnum;
 use inisire\DataObject\Schema\Type\TCollection;
 use inisire\DataObject\Schema\Type\TEnum;
 use inisire\DataObject\Schema\Type\TMixed;
@@ -53,6 +54,10 @@ class SpecificationBuilder
         } elseif ($type instanceof TEnum) {
             $schema = $this->createTypeSpecification($type->getType());
             $schema['enum'] = $type->isKeyAsLabel() ? array_keys($type->getOptions()) : $type->getOptions();
+            return $schema;
+        } elseif ($type instanceof TBuiltinEnum) {
+            $schema = $this->createTypeSpecification($type->getType());
+            $schema['enum'] = $type->getOptions();
             return $schema;
         }
 
@@ -164,7 +169,7 @@ class SpecificationBuilder
         return $result;
     }
 
-    public function addPath(string $method, string $path, RequestSchema $request = null, array $responses = [], array $tags = [], string $description = "")
+    public function addPath(string $method, string $path, ?RequestSchema $request = null, array $responses = [], array $tags = [], string $description = "")
     {
         $parametersSchema = [];
         $requestBodySchema = [];
