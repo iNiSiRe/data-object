@@ -103,7 +103,7 @@ class ScalarSerializer implements DataSerializerInterface
             }
 
             $filteredData = $this->filter($type->getType(), $data, $errors);
-            if (null === $filteredData = $type->getEnum()::tryFrom($filteredData)) {
+            if (null === $filteredData || null === $filteredData = $type->getEnum()::tryFrom($filteredData)) {
                 $errors[] = Errors::create(Errors::INVALID_ENUM);
             }
         } else {
