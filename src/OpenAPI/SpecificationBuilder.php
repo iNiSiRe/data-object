@@ -92,8 +92,7 @@ class SpecificationBuilder
 
     public function createObjectSchema(TObject $type): array
     {
-        $parts = explode('\\', $type->getClass());
-        $name = end($parts);
+        $name = str_replace('\\', '.', $type->getClass());
 
         if ($this->specification->hasSchema($name)) {
             return $this->specification->getSchemaRef($name);
@@ -110,8 +109,10 @@ class SpecificationBuilder
             }
         }
 
+        $parts = explode('\\', $type->getClass());
         $schema = [
-            'type' => 'object'
+            'type' => 'object',
+            'title' => end($parts),
         ];
 
         if (!empty($properties)) {
