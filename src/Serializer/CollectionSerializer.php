@@ -11,9 +11,8 @@ use inisire\DataObject\DataObjectWizard;
 class CollectionSerializer implements DataSerializerInterface
 {
     public function __construct(
-        private DataSerializerProvider $provider
-    )
-    {
+        private DataSerializerProvider $provider,
+    ) {
     }
 
     public function serialize(Type|TCollection $type, mixed $data)
@@ -22,12 +21,12 @@ class CollectionSerializer implements DataSerializerInterface
             return $data;
         }
 
-        $serializer = $this->provider->getByType($type->getEntry());
-
         $container = $type->getContainer();
+        $entryType = $type->getEntry();
+        $serializer = $this->provider->getByType($entryType);
 
         foreach ($data as $item) {
-            $container[] = $serializer->serialize($type->getEntry(), $item);
+            $container[] = $serializer->serialize($entryType, $item);
         }
 
         return $container;

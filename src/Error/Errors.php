@@ -16,6 +16,8 @@ class Errors
     public const INVALID_SCALAR = '1ec040c8-9743-6d12-882e-89234ca322a1';
     public const INVALID_ENUM = '1ec040c8-d1c3-6dde-b70a-d9b7bea2f197';
     public const INVALID_COLLECTION = '1ec04161-d86f-6180-91a5-af4fa04bbd33';
+    public const INVALID_UUID = 'b6c9f2af-718f-4a16-a77d-5fd14e2aa473';
+    public const INVALID_UUID_VERSION = 'd1ce7f45-127f-4845-9208-de7f3cd1b3cf';
     public const IS_NOT_WRITABLE = 'c5062e95-be2d-4450-b883-9a5d402f61ba';
     public const INVALID_DISCRIMINATOR = 'e4a885b7-3f07-4552-b6e8-87fa0a27e8c9';
     public const IS_BLANK = '373321c4-0174-4090-9310-30c32e20bf9b';
@@ -30,6 +32,8 @@ class Errors
         self::INVALID_SCALAR           => 'This value should be a valid scalar',
         self::INVALID_ENUM             => 'This value should be in enum',
         self::INVALID_COLLECTION       => 'This value should be a collection',
+        self::INVALID_UUID             => 'This value should be an UUID',
+        self::INVALID_UUID_VERSION     => 'This value should be an UUID of specific version',
         self::IS_NOT_WRITABLE          => 'This property has read only access',
         self::INVALID_DISCRIMINATOR    => 'This value should be a valid discriminator. Available: {{values}}',
         self::IS_BLANK                 => 'This value should not be blank',

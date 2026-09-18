@@ -9,6 +9,7 @@ use inisire\DataObject\Schema\Schema;
 use inisire\DataObject\Schema\Type\Type;
 use inisire\DataObject\Schema\Type\TBuiltinEnum;
 use inisire\DataObject\Schema\Type\TCollection;
+use inisire\DataObject\Schema\Type\TDictionary;
 use inisire\DataObject\Schema\Type\TEnum;
 use inisire\DataObject\Schema\Type\TMixed;
 use inisire\DataObject\Schema\Type\TObjectReference;
@@ -43,6 +44,8 @@ class SpecificationBuilder
             return $this->createObjectSchema($type);
         } elseif ($type instanceof TCollection) {
             return $this->createCollectionSchema($type);
+        } elseif ($type instanceof TDictionary) {
+            return $this->createDictionarySchema($type);
         } elseif ($type instanceof TPolymorphObject) {
             return $this->createPolymorphObjectSchema($type);
         } elseif ($type instanceof TMixed) {
@@ -131,6 +134,19 @@ class SpecificationBuilder
             'type' => 'array',
             'items' => $this->createTypeSpecification($type->getEntry())
         ];
+    }
+
+    private function createDictionarySchema(TDictionary $type): array
+    {
+        return (null === $entryType = $type->getEntry())
+            ? [
+                'type' => 'object',
+                'additionalProperties' => ['type' => 'string']
+            ]
+            : [
+                'type' => 'object',
+                'additionalProperties' => $this->createTypeSpecification($entryType),
+            ];
     }
 
     private function createPolymorphObjectSchema(TPolymorphObject $type): array

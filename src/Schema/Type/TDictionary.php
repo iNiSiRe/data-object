@@ -2,17 +2,20 @@
 
 namespace inisire\DataObject\Schema\Type;
 
-
 use inisire\DataObject\Serializer\DictionarySerializer;
 
-class TDictionary extends TPrimitive implements \inisire\DataObject\OpenAPI\Type
+class TDictionary extends TPrimitive
 {
-    public function getSchema(): array
+    public ?Type $entry;
+
+    public function __construct(?Type $entry = null)
     {
-        return [
-            'type' => 'object',
-            'additionalProperties' => ['type' => 'string']
-        ];
+        $this->entry = $entry;
+    }
+
+    public function getEntry(): ?Type
+    {
+        return $this->entry;
     }
 
     public function getSerializer(): string

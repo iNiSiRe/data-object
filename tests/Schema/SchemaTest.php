@@ -30,7 +30,7 @@ class SchemaTest extends TestCase
         $provider = new DataSerializerProvider();
         $provider->add([
             new ScalarSerializer(),
-            new DictionarySerializer(),
+            new DictionarySerializer($provider),
             new DateTimeSerializer(),
             new FileSerializer(),
             new ObjectSerializer($provider),

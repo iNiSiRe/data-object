@@ -33,6 +33,17 @@ class UuidSerializer implements DataSerializerInterface
             return null;
         }
 
-        return Uuid::fromString($data);
+        if (!Uuid::isValid($data)) {
+            $errors[] = Errors::create(Errors::INVALID_UUID);
+            return null;
+        }
+
+        $class = $type->getClass();
+        if (!$class::isValid($data)) {
+            $errors[] = Errors::create(Errors::INVALID_UUID_VERSION);
+            return null;
+        }
+
+        return $class::fromString($data);
     }
 }

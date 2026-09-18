@@ -4,7 +4,6 @@ namespace inisire\DataObject\Schema\Type;
 
 use inisire\DataObject\Serializer\CollectionSerializer;
 
-
 class TCollection implements Type
 {
     public Type $entry;
